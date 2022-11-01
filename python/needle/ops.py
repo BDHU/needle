@@ -74,12 +74,15 @@ class PowerScalar(TensorOp):
 
     def compute(self, a: NDArray) -> NDArray:
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        return array_api.power(a, self.scalar)
         ### END YOUR SOLUTION
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input = node.inputs
+        print("input: ", input[0])
+        print(input[0].__class__.__name__)
+        return (out_grad * self.scalar * array_api.power(input, self.scalar - 1))
         ### END YOUR SOLUTION
 
 
