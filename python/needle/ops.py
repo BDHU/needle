@@ -80,8 +80,6 @@ class PowerScalar(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input = node.inputs
-        print("input: ", input[0])
-        print(input[0].__class__.__name__)
         return (out_grad * self.scalar * array_api.power(input, self.scalar - 1))
         ### END YOUR SOLUTION
 
@@ -95,12 +93,13 @@ class EWiseDiv(TensorOp):
 
     def compute(self, a, b):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        return array_api.divide(a, b)
         ### END YOUR SOLUTION
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        lhs, rhs = node.inputs
+        return out_grad / rhs, out_grad * (-lhs / (rhs) ** 2)
         ### END YOUR SOLUTION
 
 
@@ -220,7 +219,7 @@ def matmul(a, b):
 class Negate(TensorOp):
     def compute(self, a):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        return array_api.negative(a)
         ### END YOUR SOLUTION
 
     def gradient(self, out_grad, node):
