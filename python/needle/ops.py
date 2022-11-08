@@ -86,8 +86,8 @@ class PowerScalar(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs
-        return (out_grad * self.scalar * array_api.power(input, self.scalar - 1))
+        input, = node.inputs
+        return (out_grad * self.scalar * (input ** (self.scalar - 1)))
         ### END YOUR SOLUTION
 
 
@@ -106,7 +106,7 @@ class EWiseDiv(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         lhs, rhs = node.inputs
-        return array_api.divide(out_grad, rhs), out_grad * (-lhs / (rhs) ** 2)
+        return out_grad / rhs, out_grad * (-lhs / (rhs) ** 2)
         ### END YOUR SOLUTION
 
 
@@ -125,7 +125,8 @@ class DivScalar(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        return array_api.divide(out_grad, self.scalar)
+        # return array_api.divide(out_grad, self.scalar)
+        return out_grad / self.scalar
         ### END YOUR SOLUTION
 
 
@@ -156,8 +157,8 @@ class Transpose(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs
-        return array_api.divide(input, input)
+        input, = node.inputs
+        return input / input
         ### END YOUR SOLUTION
 
 
@@ -176,8 +177,8 @@ class Reshape(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs[0]
-        return array_api.divide(input, input)
+        input, = node.inputs
+        return input / input
         ### END YOUR SOLUTION
 
 
@@ -194,7 +195,8 @@ class BroadcastTo(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input, = node.inputs
+        return array_api.prod(self.shape) / array_api.prod(input.shape) * (input / input)
         ### END YOUR SOLUTION
 
 
@@ -213,8 +215,9 @@ class Summation(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs
-        return out_grad * input
+        input, = node.inputs
+        return array_api.ones(input.shape)
+        # return out_grad * input
         ### END YOUR SOLUTION
 
 
@@ -264,7 +267,7 @@ class Log(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs
+        input, = node.inputs
         return out_grad / input
         ### END YOUR SOLUTION
 
