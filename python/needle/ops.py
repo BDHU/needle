@@ -216,8 +216,7 @@ class Summation(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        return array_api.ones(input.shape)
-        # return out_grad * input
+        return input / input
         ### END YOUR SOLUTION
 
 
