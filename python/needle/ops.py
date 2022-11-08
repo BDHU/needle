@@ -63,7 +63,7 @@ class MulScalar(TensorOp):
         self.scalar = scalar
 
     def compute(self, a: NDArray):
-        return a * self.scalar
+        return self.scalar * a
 
     def gradient(self, out_grad: Tensor, node: Tensor):
         return (out_grad * self.scalar,)
@@ -106,7 +106,7 @@ class EWiseDiv(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         lhs, rhs = node.inputs
-        return out_grad / rhs, out_grad * (-lhs / (rhs) ** 2)
+        return array_api.divide(out_grad, rhs), out_grad * (-lhs / (rhs) ** 2)
         ### END YOUR SOLUTION
 
 
@@ -125,7 +125,7 @@ class DivScalar(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        return out_grad / self.scalar
+        return array_api.divide(out_grad, self.scalar)
         ### END YOUR SOLUTION
 
 
@@ -156,14 +156,8 @@ class Transpose(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        input = node.inputs[0]
-        # return array_api.full(input.shape, out_grad)
-        # return array_api.full(input.shape, out_grad)
-        input_shape = input.shape
-        identity = array_api.zeros(input_shape)
-        idx = array_api.arange(input_shape[0])
-        # return out_grad * transpose(input, self.axes)
-        return out_grad
+        input = node.inputs
+        return array_api.divide(input, input)
         ### END YOUR SOLUTION
 
 
@@ -182,7 +176,8 @@ class Reshape(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input = node.inputs[0]
+        return array_api.divide(input, input)
         ### END YOUR SOLUTION
 
 
@@ -236,7 +231,8 @@ class MatMul(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         a, b = node.inputs
-        return array_api.matmul(da, b) + array_api.matmul(a, db)
+        # return array_api.matmul(da, b) + array_api.matmul(a, db)
+        return out_grad * transpose(b), out_grad * transpose(a)
         ### END YOUR SOLUTION
 
 
@@ -268,7 +264,8 @@ class Log(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input = node.inputs
+        return out_grad / input
         ### END YOUR SOLUTION
 
 
