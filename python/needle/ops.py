@@ -232,8 +232,27 @@ class MatMul(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
+        batch_size = out_grad.shape[0]
         A, B = node.inputs
-        return matmul(out_grad, transpose(B)), matmul(transpose(A), out_grad)
+
+        if batch_size == A.shape[0] and batch_size == B.shape[0]:
+            return matmul(out_grad, transpose(B)), matmul(transpose(A), out_grad)
+        elif batch_size == A.shape[0] and batch_size != B.shape[0]:
+            B_grad = matmul(transpose(A), out_grad)
+            sum_id = B_grad.shape.index(B.shape[0])
+            while sum_id > 0:
+                sum_id -= 1
+                B_grad = summation(B_grad, 0)
+            return matmul(out_grad, transpose(B)), B_grad
+        elif batch_size != A.shape[0] and batch_size == B.shape[0]:
+            A_grad = matmul(out_grad, transpose(B))
+            sum_id = A_grad.shape.index(A.shape[0])
+            while sum_id > 0:
+                sum_id -= 1
+                A_grad = summation(A_grad, 0)
+            return A_grad, matmul(transpose(A), out_grad)
+        else:
+            raise RuntimeError()
         ### END YOUR SOLUTION
 
 
