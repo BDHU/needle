@@ -409,14 +409,24 @@ def find_topo_sort(node_list: List[Value]) -> List[Value]:
     sort.
     """
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    visited_nodes = set()
+    topo_order: List[Value] = []
+    for node in node_list:
+        topo_sort_dfs(node, visited_nodes, topo_order)
+    return topo_order
     ### END YOUR SOLUTION
 
 
 def topo_sort_dfs(node, visited, topo_order):
     """Post-order DFS"""
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    # TODO: doesn't detect cycle yet
+    if node in visited:
+        return
+    for input in node.inputs:
+        topo_sort_dfs(input, visited, topo_order)
+    visited.add(node)
+    topo_order.append(node)
     ### END YOUR SOLUTION
 
 
