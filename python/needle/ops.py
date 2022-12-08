@@ -196,7 +196,11 @@ class BroadcastTo(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        return array_api.prod(self.shape) / array_api.prod(input.shape) * (input / input)
+        diff = len(out_grad.shape) - len(input.shape)
+        # Force input and out_grad to take the same number of shape dim
+        input_padded_shape = tuple(array_api.ones((diff,), dtype=int)) + input.shape
+        sum_axes = tuple([i for i, (g, s) in enumerate(zip(input_padded_shape, out_grad.shape)) if g!=s])
+        return reshape(summation(out_grad, sum_axes), input.shape)
         ### END YOUR SOLUTION
 
 

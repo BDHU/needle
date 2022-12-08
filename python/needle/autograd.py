@@ -396,7 +396,18 @@ def compute_gradient_of_variables(output_tensor, out_grad):
     reverse_topo_order = list(reversed(find_topo_sort([output_tensor])))
 
     ### BEGIN YOUR SOLUTION
-    raise NotImplementedError()
+    for node in reverse_topo_order:
+        node.grad = sum_node_list(node_to_output_grads_list[node])
+        if not node.inputs:
+            continue
+        input_grads = node.op.gradient_as_tuple(node.grad, node)
+       
+        for id, input in enumerate(node.inputs):
+            if input not in node_to_output_grads_list:
+                node_to_output_grads_list[input] = []
+            node_to_output_grads_list[input].append(input_grads[id])
+
+    return node_to_output_grads_list
     ### END YOUR SOLUTION
 
 
@@ -441,3 +452,9 @@ def sum_node_list(node_list):
     from functools import reduce
 
     return reduce(add, node_list)
+
+def is_leaf_node(node):
+    """Custom helper function to check if a node has any inputs"""
+    if not node.inputs:
+        return True
+    return False
