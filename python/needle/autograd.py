@@ -294,6 +294,10 @@ class Tensor(Value):
         return self.realize_cached_data().shape
 
     @property
+    def ndim(self):
+        return len(self.shape)
+
+    @property
     def dtype(self):
         return self.realize_cached_data().dtype
 

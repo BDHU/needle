@@ -158,7 +158,16 @@ class Transpose(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        return input / input
+        if self.axes is None:
+            if out_grad.ndim >= 2:
+                return transpose(out_grad, out_grad.ndim - 2, out_grad.ndim - 1)
+            else:
+                return out_grad
+        
+        if len(self.axes) > out_grad.ndim or len(self.axes) < 2:
+            return out_grad
+            
+        return transpose(out_grad, axes=self.axes)
         ### END YOUR SOLUTION
 
 
@@ -178,7 +187,7 @@ class Reshape(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        return input / input
+        return reshape(out_grad, input.shape)
         ### END YOUR SOLUTION
 
 
@@ -196,7 +205,7 @@ class BroadcastTo(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        diff = len(out_grad.shape) - len(input.shape)
+        diff = out_grad.ndim - input.ndim
         # Force input and out_grad to take the same number of shape dim
         input_padded_shape = tuple(array_api.ones((diff,), dtype=int)) + input.shape
         sum_axes = tuple([i for i, (g, s) in enumerate(zip(input_padded_shape, out_grad.shape)) if g!=s])
@@ -220,7 +229,14 @@ class Summation(TensorOp):
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
         input, = node.inputs
-        return input / input
+        i_s = array_api.array(input.shape)
+
+        # reshape out_grad to have the same ndim as input
+        if self.axes is not None:
+            i_s[array_api.array(self.axes)] = int(1)
+            out_grad = reshape(out_grad, tuple(i_s))
+
+        return broadcast_to(out_grad, input.shape)
         ### END YOUR SOLUTION
 
 
