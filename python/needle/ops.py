@@ -319,7 +319,8 @@ class Exp(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input, = node.inputs
+        return out_grad * exp(input)
         ### END YOUR SOLUTION
 
 
@@ -327,7 +328,6 @@ def exp(a):
     return Exp()(a)
 
 
-# TODO
 class ReLU(TensorOp):
     def compute(self, a):
         ### BEGIN YOUR SOLUTION
@@ -336,28 +336,40 @@ class ReLU(TensorOp):
 
     def gradient(self, out_grad, node):
         ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
+        input, = node.inputs
+        assert(input.shape == out_grad.shape)
+        mask = zeros(input.shape)
+        mask = [1 for (i, j) in zip(mask, input) if j >= 0]
+        return multiply(mask, out_grad)
         ### END YOUR SOLUTION
 
 
 def relu(a):
     return ReLU()(a)
 
-
-class LogSoftmax(TensorOp):
-    def compute(self, Z):
-        ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
-        ### END YOUR SOLUTION
-
-    def gradient(self, out_grad, node):
-        ### BEGIN YOUR SOLUTION
-        raise NotImplementedError()
-        ### END YOUR SOLUTION
-
+def softmax(a):
+    exps = exp(a)
+    return exps / summation(exps, axes=0)
 
 def logsoftmax(a):
-    return LogSoftmax()(a)
+    return log(softmax(a))
+
+# class LogSoftmax(TensorOp):
+#     def compute(self, Z):
+#         ### BEGIN YOUR SOLUTION
+#         exps = array_api.exp(Z - Z.max())
+#         return array_api.log(exps / array_api.sum(exps))
+#         ### END YOUR SOLUTION
+
+#     def gradient(self, out_grad, node):
+#         ### BEGIN YOUR SOLUTION
+#         input, = node.inputs
+#         return out_grad * logsoftmax(input) * (1.0 - (exp(input) / summation(input, axes=0)))
+#         ### END YOUR SOLUTION
+
+
+# def logsoftmax(a):
+#     return LogSoftmax()(a)
 
 
 # additional helper functions
